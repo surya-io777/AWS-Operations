@@ -1,0 +1,368 @@
+# Enhanced Tools Schema for AWS Operations Agent
+# Supports Easy/Customize modes and comprehensive AWS actions
+
+tools_schema:
+  # Resource Creation Tools
+  - name: "create_ec2_instance"
+    description: "Create EC2 instance with Easy (smart defaults) or Customize (full control) mode"
+    inputSchema:
+      type: "object"
+      properties:
+        mode:
+          type: "string"
+          enum: ["easy", "customize"]
+          description: "Easy mode uses smart defaults, Customize mode asks detailed questions"
+        purpose:
+          type: "string"
+          enum: ["web_server", "database", "development", "api_server", "general"]
+          description: "Purpose of the instance (used for smart defaults in easy mode)"
+        instance_type:
+          type: "string"
+          description: "Instance type (only for customize mode)"
+        ami_id:
+          type: "string"
+          description: "AMI ID (only for customize mode)"
+        security_groups:
+          type: "array"
+          items:
+            type: "string"
+          description: "Security group names (only for customize mode)"
+        key_pair:
+          type: "string"
+          description: "Key pair name (only for customize mode)"
+        subnet_id:
+          type: "string"
+          description: "Subnet ID (only for customize mode)"
+        user_data:
+          type: "string"
+          description: "User data script (only for customize mode)"
+        tags:
+          type: "object"
+          description: "Additional tags (only for customize mode)"
+      required: ["mode"]
+
+  - name: "create_lambda_function"
+    description: "Create Lambda function with Easy (smart defaults) or Customize (full control) mode"
+    inputSchema:
+      type: "object"
+      properties:
+        mode:
+          type: "string"
+          enum: ["easy", "customize"]
+          description: "Easy mode uses smart defaults, Customize mode asks detailed questions"
+        purpose:
+          type: "string"
+          enum: ["image_processing", "api_endpoint", "data_processing", "scheduled_task", "general"]
+          description: "Purpose of the function (used for smart defaults and code generation)"
+        function_name:
+          type: "string"
+          description: "Function name"
+        runtime:
+          type: "string"
+          description: "Runtime (only for customize mode)"
+        memory_size:
+          type: "integer"
+          description: "Memory allocation in MB (only for customize mode)"
+        timeout:
+          type: "integer"
+          description: "Timeout in seconds (only for customize mode)"
+        environment_variables:
+          type: "object"
+          description: "Environment variables (only for customize mode)"
+        vpc_config:
+          type: "object"
+          description: "VPC configuration (only for customize mode)"
+        code_description:
+          type: "string"
+          description: "What should the function do? (for code generation)"
+      required: ["mode"]
+
+  - name: "create_rds_database"
+    description: "Create RDS database with Easy (smart defaults) or Customize (full control) mode"
+    inputSchema:
+      type: "object"
+      properties:
+        mode:
+          type: "string"
+          enum: ["easy", "customize"]
+          description: "Easy mode uses smart defaults, Customize mode asks detailed questions"
+        purpose:
+          type: "string"
+          enum: ["ecommerce", "analytics", "development", "production", "general"]
+          description: "Purpose of the database (used for smart defaults)"
+        db_name:
+          type: "string"
+          description: "Database identifier"
+        engine:
+          type: "string"
+          enum: ["mysql", "postgresql", "oracle-ee", "sqlserver-ex"]
+          description: "Database engine (only for customize mode)"
+        instance_class:
+          type: "string"
+          description: "Instance class (only for customize mode)"
+        allocated_storage:
+          type: "integer"
+          description: "Storage size in GB (only for customize mode)"
+        multi_az:
+          type: "boolean"
+          description: "Multi-AZ deployment (only for customize mode)"
+        backup_retention:
+          type: "integer"
+          description: "Backup retention period in days (only for customize mode)"
+        master_username:
+          type: "string"
+          description: "Master username (only for customize mode)"
+        vpc_security_groups:
+          type: "array"
+          items:
+            type: "string"
+          description: "VPC security group IDs (only for customize mode)"
+      required: ["mode"]
+
+  - name: "create_s3_bucket"
+    description: "Create S3 bucket with Easy (smart defaults) or Customize (full control) mode"
+    inputSchema:
+      type: "object"
+      properties:
+        mode:
+          type: "string"
+          enum: ["easy", "customize"]
+          description: "Easy mode uses smart defaults, Customize mode asks detailed questions"
+        purpose:
+          type: "string"
+          enum: ["static_website", "data_backup", "logs", "media_storage", "general"]
+          description: "Purpose of the bucket (used for smart defaults)"
+        bucket_name:
+          type: "string"
+          description: "Bucket name (must be globally unique)"
+        region:
+          type: "string"
+          description: "AWS region (only for customize mode)"
+        versioning:
+          type: "boolean"
+          description: "Enable versioning (only for customize mode)"
+        public_access:
+          type: "string"
+          enum: ["block_all", "allow_public_read", "allow_public_write", "custom"]
+          description: "Public access settings (only for customize mode)"
+        encryption:
+          type: "string"
+          enum: ["none", "aes256", "kms"]
+          description: "Server-side encryption (only for customize mode)"
+        lifecycle_rules:
+          type: "array"
+          description: "Lifecycle rules (only for customize mode)"
+      required: ["mode", "bucket_name"]
+
+  # Resource Management Tools
+  - name: "manage_ec2_instances"
+    description: "Manage EC2 instances (start, stop, reboot, terminate)"
+    inputSchema:
+      type: "object"
+      properties:
+        action:
+          type: "string"
+          enum: ["start", "stop", "reboot", "terminate", "modify"]
+          description: "Action to perform"
+        instance_ids:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of instance IDs"
+        filters:
+          type: "object"
+          description: "Filters to select instances (alternative to instance_ids)"
+        confirmation:
+          type: "boolean"
+          description: "User confirmation for destructive actions"
+        new_instance_type:
+          type: "string"
+          description: "New instance type (for modify action)"
+      required: ["action"]
+
+  - name: "manage_lambda_functions"
+    description: "Manage Lambda functions (update code, configuration, delete)"
+    inputSchema:
+      type: "object"
+      properties:
+        action:
+          type: "string"
+          enum: ["update_code", "update_config", "delete", "invoke"]
+          description: "Action to perform"
+        function_name:
+          type: "string"
+          description: "Function name or ARN"
+        code_description:
+          type: "string"
+          description: "What should the updated code do? (for update_code action)"
+        memory_size:
+          type: "integer"
+          description: "New memory size (for update_config action)"
+        timeout:
+          type: "integer"
+          description: "New timeout (for update_config action)"
+        environment_variables:
+          type: "object"
+          description: "Environment variables (for update_config action)"
+        test_payload:
+          type: "object"
+          description: "Test payload (for invoke action)"
+        confirmation:
+          type: "boolean"
+          description: "User confirmation for destructive actions"
+      required: ["action", "function_name"]
+
+  - name: "manage_rds_databases"
+    description: "Manage RDS databases (start, stop, modify, delete, create snapshot)"
+    inputSchema:
+      type: "object"
+      properties:
+        action:
+          type: "string"
+          enum: ["start", "stop", "modify", "delete", "create_snapshot", "restore"]
+          description: "Action to perform"
+        db_identifier:
+          type: "string"
+          description: "Database identifier"
+        new_instance_class:
+          type: "string"
+          description: "New instance class (for modify action)"
+        allocated_storage:
+          type: "integer"
+          description: "New storage size (for modify action)"
+        snapshot_id:
+          type: "string"
+          description: "Snapshot identifier (for create_snapshot or restore action)"
+        confirmation:
+          type: "boolean"
+          description: "User confirmation for destructive actions"
+      required: ["action", "db_identifier"]
+
+  # Cost Optimization Tools
+  - name: "cost_optimization_actions"
+    description: "Perform cost optimization actions across AWS services"
+    inputSchema:
+      type: "object"
+      properties:
+        action:
+          type: "string"
+          enum: ["find_unused_resources", "cleanup_unused", "resize_oversized", "schedule_instances"]
+          description: "Cost optimization action"
+        resource_types:
+          type: "array"
+          items:
+            type: "string"
+            enum: ["ec2", "ebs", "rds", "lambda", "s3", "all"]
+          description: "Resource types to optimize"
+        dry_run:
+          type: "boolean"
+          description: "Preview changes without executing"
+        unused_days:
+          type: "integer"
+          description: "Consider resources unused after X days"
+        confirmation:
+          type: "boolean"
+          description: "User confirmation for cleanup actions"
+      required: ["action"]
+
+  # Security Actions
+  - name: "security_remediation_actions"
+    description: "Perform security remediation actions"
+    inputSchema:
+      type: "object"
+      properties:
+        action:
+          type: "string"
+          enum: ["fix_public_s3", "rotate_access_keys", "update_security_groups", "enable_mfa", "audit_permissions"]
+          description: "Security action to perform"
+        resource_ids:
+          type: "array"
+          items:
+            type: "string"
+          description: "Specific resource IDs (optional)"
+        dry_run:
+          type: "boolean"
+          description: "Preview changes without executing"
+        confirmation:
+          type: "boolean"
+          description: "User confirmation for security changes"
+      required: ["action"]
+
+  # Infrastructure as Code
+  - name: "cloudformation_operations"
+    description: "Manage CloudFormation stacks"
+    inputSchema:
+      type: "object"
+      properties:
+        action:
+          type: "string"
+          enum: ["create", "update", "delete", "rollback", "drift_detection"]
+          description: "CloudFormation action"
+        stack_name:
+          type: "string"
+          description: "Stack name"
+        template_description:
+          type: "string"
+          description: "Describe what infrastructure to create (for create action)"
+        template_url:
+          type: "string"
+          description: "Template URL (optional)"
+        parameters:
+          type: "object"
+          description: "Stack parameters"
+        confirmation:
+          type: "boolean"
+          description: "User confirmation for destructive actions"
+      required: ["action", "stack_name"]
+
+  # Monitoring and Alerting
+  - name: "monitoring_setup"
+    description: "Set up monitoring and alerting for AWS resources"
+    inputSchema:
+      type: "object"
+      properties:
+        action:
+          type: "string"
+          enum: ["create_dashboard", "create_alarms", "setup_logging", "configure_notifications"]
+          description: "Monitoring action"
+        resource_type:
+          type: "string"
+          enum: ["ec2", "lambda", "rds", "s3", "custom"]
+          description: "Resource type to monitor"
+        resource_ids:
+          type: "array"
+          items:
+            type: "string"
+          description: "Specific resource IDs"
+        metrics:
+          type: "array"
+          items:
+            type: "string"
+          description: "Metrics to monitor"
+        notification_email:
+          type: "string"
+          description: "Email for notifications"
+      required: ["action", "resource_type"]
+
+  # Read Operations (Enhanced from original)
+  - name: "comprehensive_aws_query"
+    description: "Query any AWS service with natural language. Supports complex multi-service queries."
+    inputSchema:
+      type: "object"
+      properties:
+        query:
+          type: "string"
+          description: "Natural language query about AWS resources"
+        services:
+          type: "array"
+          items:
+            type: "string"
+          description: "Specific AWS services to query (optional)"
+        format:
+          type: "string"
+          enum: ["detailed", "summary", "table", "json"]
+          description: "Response format preference"
+        include_costs:
+          type: "boolean"
+          description: "Include cost information in response"
+      required: ["query"]
